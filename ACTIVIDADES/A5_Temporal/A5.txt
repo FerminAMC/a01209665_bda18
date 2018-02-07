@@ -1,4 +1,5 @@
-------------
+docker run -it -p 50000:50000 -e DB2INST1_PASSWORD=40846382 -e LICENSE=accept ibmcom/db2express-c:latest bash
+
 
 create table class
 (course_number int not null,
@@ -97,3 +98,10 @@ where poliza_id = n.poliza_id)
 update poliza
 set costo = costo * (months_between (n.fin_poliza, o.fin_poliza)/months_between (o.fin_poliza, o.fin_poliza))
 end
+
+create trigger subir_cobertura
+  after update on poliza
+  referencing new as n old as o
+  for each row begin
+  when (n.tipo_cobertura < (select tipo_cobertura from poliza where poliza_id = n.poliza_id))
+  signal sqlstate '75000' set message_text = 'No puede bajar de cobertura'
