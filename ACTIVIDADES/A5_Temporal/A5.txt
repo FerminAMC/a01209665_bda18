@@ -1,4 +1,4 @@
-docker run -it -p 50000:50000 -e DB2INST1_PASSWORD=40846382 -e LICENSE=accept ibmcom/db2express-c:latest bash
+docker run -it -p 50001:50001 -e DB2INST1_PASSWORD=40846382 -e LICENSE=accept ibmcom/db2express-c:latest bash
 
 
 create table class

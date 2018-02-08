@@ -12,7 +12,7 @@ on orderdetails (quantityOrdered);
 
 show index from orderdetails;
 
-explain 
+explain
 select orders.*, orderdetails.*, products.*, productlines.* 
 from productlines 
 join products on products.productLine = productlines.productLine
