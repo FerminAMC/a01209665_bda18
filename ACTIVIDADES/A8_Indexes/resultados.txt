@@ -1,0 +1,10 @@
+index 1: 
+	Rows: 326
+
+index 2:
+	Rows: 66
+
+index 3:
+	Rows: 5
+
+Index 3 is more efficient because it looks through less rows.

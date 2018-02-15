@@ -1,10 +1,9 @@
 DELIMITER $$
-CREATE PROCEDURE count_names(IN letter varchar(1))
+CREATE PROCEDURE count_names(IN letter varchar(2))
 BEGIN
 	DECLARE counter INT DEFAULT 0;
-    DECLARE concat_name VARCHAR(2);
-	SET concat_name = CONCAT(letter, "%");
-    SELECT COUNT(customerName) INTO counter FROM customers WHERE customerName LIKE concat_name;
+	SET letter = CONCAT(letter, "%");
+    SELECT COUNT(customerName) INTO counter FROM customers WHERE customerName LIKE letter;
     SELECT counter;
 END $$
 DELIMITER ;
