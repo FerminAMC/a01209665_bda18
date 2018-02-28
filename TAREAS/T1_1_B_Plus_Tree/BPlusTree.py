@@ -27,6 +27,34 @@ class BPlusTree(object):
                 node = next
         node.add_key(key)
 
+    # Searches for a key in the tree. Returns true if the key is found
+    def search(self, value, node=None):
+        if node is None:
+            node = self.root
+        if(value in node.keys):
+            return True
+        elif(node.leaf):
+            # When you reach a leaf, there is nowhere else to check
+            return False
+        else:
+            i = 0
+            while(i < node.size and value > node.keys[i]):
+                i += 1
+            return(self.search(value, node.children[i]))
+
+    # Prints a leveled representation of the tree
+    def print_order(self):
+        this_level = [self.root]
+        while this_level:
+            next_level = []
+            output = ""
+            for node in this_level:
+                if node.children:
+                    next_level.extend(node.children)
+                output += str(node.keys) + " "
+            print(output)
+            this_level = next_level
+
     class Node(object):
         def __init__(self, t):
             self.leaf = True
