@@ -1,0 +1,86 @@
+#Utilizo Id's en varios campos para evitar repetir informacion. Basta con utilizar el id para buscar algo en una coleccion.
+
+use escuela
+db.createCollection("cursos")
+db.cursos.insert({titulo_curso:"Bases de Datos"})
+db.cursos.update({titulo_curso:"Bases de Datos"}, {$set:{profesor:"Ariel"}})
+db.cursos.update({titulo_curso:"Bases de Datos"}, {$set:{anno:"2018"}})
+db.cursos.update({titulo_curso:"Bases de Datos"}, {$set:{alumnos:[]}})
+db.cursos.update({titulo_curso:"Bases de Datos"}, {$addToSet:{alumnos:ObjectId("5aa995a9745e7142674a11e6")}})
+db.cursos.update({titulo_curso:"Bases de Datos"}, {$set:{evaluaciones_escritas:[]}})
+db.cursos.update({titulo_curso:"Bases de Datos"}, {$push:{evaluaciones_escritas:{preguntas_practicas:"9", preguntas_teoricas:"3"}}})
+db.cursos.update({titulo_curso:"Bases de Datos"}, {$set:{comentarios:["Muy buen curso"]}})
+db.cursos.update({titulo_curso:"Bases de Datos"}, {$set:{profesor:ObjectId("5aa9e90984203d45cd4444e5")}})
+
+
+
+db.createCollection("alumnos")
+db.alumnos.insert({nombre:"Alex", matricula:"A01209665", direccion:"Villa Verdun", genero:"hombre"})
+db.alumnos.update({matricula:"A01209665"}, {$set:{cursos:[ObjectId("5aa9912d94bb48648546fe2f")]}})
+db.alumnos.update({matricula:"A01209665"}, {$set:{evaluacion_curso:"100"}})
+db.alumnos.update({matricula:"A01209665"}, {$set:{evaluaciones:[{eval_1:"100", eval_2:"100", eval_3:"100", eval_4:"100"}]}})
+
+
+
+db.createCollection("profesores")
+db.profesores.insert({nombre:"Ariel", nomina:"123456789", genero:"hombre"})
+db.profesores.update({nomina:"123456789"}, {$set:{cursos:[ObjectId("5aa9912d94bb48648546fe2f")]}})
+
+
+curso_id: ObjectId("5aa9912d94bb48648546fe2f")
+alumno_id: ObjectId("5aa995a9745e7142674a11e6")
+profesor_id: ObjectId("5aa9e90984203d45cd4444e5")
+
+#Vista final de las colecciones:
+
+#Cursos
+{
+	"_id" : ObjectId("5aa9912d94bb48648546fe2f"),
+	"titulo_curso" : "Bases de Datos",
+	"profesor" : ObjectId("5aa9e90984203d45cd4444e5"),
+	"anno" : "2018",
+	"alumnos" : [
+		ObjectId("5aa995a9745e7142674a11e6")
+	],
+	"evaluaciones_escritas" : [
+		{
+			"preguntas_practicas" : "9",
+			"preguntas_teoricas" : "3"
+		}
+	],
+	"comentarios" : [
+		"Muy buen curso"
+	]
+}
+
+#Alumnos
+{
+	"_id" : ObjectId("5aa995a9745e7142674a11e6"),
+	"nombre" : "Alex",
+	"matricula" : "A01209665",
+	"direccion" : "Villa Verdun",
+	"genero" : "hombre",
+	"cursos" : [
+		ObjectId("5aa9912d94bb48648546fe2f")
+	],
+	"evaluacion_curso" : "100",
+	"evaluaciones" : [
+		{
+			"eval_1" : "100",
+			"eval_2" : "100",
+			"eval_3" : "100",
+			"eval_4" : "100"
+		}
+	]
+}
+
+#Profesores
+{
+	"_id" : ObjectId("5aa9e90984203d45cd4444e5"),
+	"nombre" : "Ariel",
+	"nomina" : "123456789",
+	"genero" : "hombre",
+	"cursos" : [
+		ObjectId("5aa9912d94bb48648546fe2f")
+	]
+}
