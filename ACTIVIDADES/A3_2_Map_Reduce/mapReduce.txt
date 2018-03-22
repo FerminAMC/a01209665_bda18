@@ -1,0 +1,114 @@
+mongoimport --db test --collection restaurants --drop --file ~/Documents/BasesDatos/primer-dataset.json
+
+1. Cuántos restaurantes hay por ZipCode
+
+var mapZipCode = function(){
+  emit(this.address.zipcode, 1);
+};
+
+var countRestaurants = function(zipcode, value){
+  return Array.sum(value);
+};
+
+db.restaurants.mapReduce(mapZipCode, countRestaurants, {
+  out: "res"
+});
+
+db.res.find()
+
+2. ¿Cuántos grades hay por usuario?
+
+var mapGrades = function(){
+  emit(this.name, this.grades.length);
+};
+
+var countGrades = function(name, grades){
+  return grades[0];
+};
+
+db.restaurants.mapReduce(mapGrades, countGrades, {
+  out: "res"
+});
+
+db.res.find()
+
+db.restaurants.find({name: "1 Banana Queen"}).pretty()
+
+3. Cuál es el total de scores por usuario
+
+var mapScores = function(){
+  var totalScore = 0;
+  for(var i = 0; i < this.grades.length; i++){
+    totalScore += this.grades[i].score;
+  }
+  var name = this.name;
+  emit(name, totalScore);
+};
+
+var countScore = function(name, score){
+  return (name, score[0]);
+};
+
+db.restaurants.mapReduce(mapScores, countScore, {
+  out: "res"
+});
+
+db.res.find()
+
+db.restaurants.find({name: "1 Banana Queen"}).pretty()
+
+4. Cuántos restaurantes obtuvieron el grade A, Grade B y Grade C
+
+var mapGrades = function(){
+  var countA = 0;
+  var countB = 0;
+  var countC = 0;
+  for(var i = 0; i < this.grades.length; i++){
+    if(this.grades[i].grade == "A"){
+      countA = 1;
+    }
+    else if(this.grades[i].grade == "B"){
+      countB = 1;
+    }
+    else(this.grades[i].grade == "C"){
+      countC = 1;
+    }
+  }
+  emit(countA, countB, countC);
+}
+
+var countGrades = function(countA, countB, countC){
+  totalA = 0;
+  totalB = 0;
+  totalC = 0;
+  for(var i = 0; i < countA.length; i++){
+    totalA += 1;
+  }
+  for(var i = 0; i < countB.length; i++){
+    totalB += 1;
+  }
+  for(var i = 0; i < countC.length; i++){
+    totalC += 1;
+  }
+  resp = {gradeA: totalA, gradeB: totalB, gradeC: totalC};
+  return resp;
+}
+
+db.restaurants.mapReduce(mapGrades, countGrades, {
+  out: "res"
+});
+
+db.res.find()
+
+5. Agrupa los restaurantes por “cuisine” y cuenta cuántos restaurantes hay por cada categoría
+
+var cuicineMap = function(){
+    emit(this.cuisine, 1);
+};
+var cuicineQuantity = function(cuisine,score){
+    return Array.sum(score);
+};
+db.restaurantes.mapReduce(cuicineMap,cuicineQuantity,{ out:"res"})
+
+6. Cuáles son los 10 restaurantes más cercanos a:
+Restaurant_id: 40360045
