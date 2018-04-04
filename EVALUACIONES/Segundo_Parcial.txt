@@ -1,0 +1,32 @@
+// 1: Total de alumnos inscritos
+db.escuela.aggregate([
+{
+    $group: { _id: "Total students", students: { $addToSet: '$student_id'} }
+},
+{
+    $unwind:"$students"
+},
+{
+    $group: { _id: "$_id", studentCount: { $sum: 1} }
+}
+]);
+
+// 2: Total de cursos impartidos
+db.escuela.aggregate([
+{
+    $group: { _id: "Total courses", courses: { $addToSet: '$class_id'} }
+},
+{
+    $unwind:"$courses"
+},
+{
+    $group: { _id: "$_id", studentCount: { $sum: 1} }
+}
+]);
+
+// 3
+db.escuela.aggregate([
+{
+    $group: { _id: "$student_id", courses:{ $addToSet: '$class_id'} }
+}
+]);
