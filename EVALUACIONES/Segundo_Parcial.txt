@@ -25,8 +25,172 @@ db.escuela.aggregate([
 ]);
 
 // 3
-db.escuela.aggregate([
-{
-    $group: { _id: "$student_id", courses:{ $addToSet: '$class_id'} }
+var mapGrades = function(){
+  var quiz = 0
+  var countQ = 0
+  var exam = 0
+  var countE = 0
+  var homework = 0
+  var countH = 0
+  for(var i=0; i < this.scores.length; i++){
+    if(this.scores[i].type == "exam"){
+      countE += 1
+      exam += this.scores[i].score
+    }else if(this.scores[i].type == "quiz"){
+      countQ += 1
+      quiz += this.scores[i].score
+    }else{
+      countH += 1
+      homework += this.scores[i].score 
+    }
+  }
+  quiz = quiz / countQ
+  exam = exam / countE
+  homework = homework / countH
+  emit(this.student_id, [quiz, exam, homework])
 }
-]);
+var countGrades = function(key, vals){
+  sumq = 0
+  sume = 0
+  sumh = 0
+  for(var i = 0; i < vals[0].length; i++){
+    sumq += vals[0][i]
+  }
+  for(var j = 0; j < vals[1].length; j++){
+    sume += vals[1][j]
+  }
+  if(vals[2] != null){
+    for(var k = 0; k < vals[2].length; k++){
+      sumh += vals[2][k] 
+    }
+    resp = {"quiz": sumq/vals[0].length, "exam": sume/vals[1].length, "homework": sumh/vals[2].length}
+  }else{
+    resp = {"quiz": sumq/vals[0].length, "exam": sume/vals[1].length}
+  }
+  return(resp);
+}
+db.escuela.mapReduce(mapGrades, countGrades, {
+  out: "res"
+});
+
+// 4
+var mapMin = function(){
+  min = 100;
+  for(var i = 0; i < this.scores.length; i++){
+    if(this.scores[i].score < min){ 
+      min = this.scores[i].score; 
+    }
+  }
+  emit(this.student_id, [this.class_id, min]);
+}
+var getMin = function(key, val){
+  resp = {curso: val[0], calificacion: val[1]}
+  return(resp)
+}
+db.escuela.mapReduce(mapMin, getMin, {
+  out: "res"
+})
+db.res.find().sort({value:1}).limit(1)
+
+// 5
+var mapMax = function(){
+  count = 0
+  for(var i = 0; i < this.scores.length; i++){
+    if(this.scores[i].type == "homework"){ 
+      count += 1 
+    }
+  }
+  emit(this.class_id, count)
+}
+var getMax = function(key, val){
+  return(val[0])
+}
+db.escuela.mapReduce(mapMax, getMax, {
+  out: "res"
+})
+db.res.find().sort({value: -1}).limit(8)
+
+// 6
+var mapAlumnos = function(){
+  emit(this.student_id, 1)
+}
+var countCursos = function(key, val){
+  return(val.length)
+}
+db.escuela.mapReduce(mapAlumnos, countCursos, {
+  out: "res"
+})
+db.res.find().sort({value: -1}).limit(4)
+
+// 7
+
+var mapReprobados = function(){
+  for(var i=0; i<this.scores.length; i++){
+    if(this.scores[i].type == "exam" && this.scores[i].score < 70){
+      emit(this.class_id, 1)
+    }
+  }
+}
+var countReprobados = function(key, val){
+  return(val.length)
+}
+db.escuela.mapReduce(mapReprobados, countReprobados, {
+  out: "res"
+})
+db.res.find().sort({value: -1}).limit(1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
